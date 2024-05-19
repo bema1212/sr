@@ -1,0 +1,11 @@
+{
+  "name": "cors-proxy-serverless",
+  "version": "1.0.0",
+  "main": "api/handler.js",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
