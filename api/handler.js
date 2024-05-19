@@ -31,8 +31,8 @@ export default async function handler(req, res) {
         const response = await fetch(encodeURI(url), { headers });
         const html = await response.text();
 
-        // Send the HTML directly without wrapping it in an object
-        res.status(200).send(html);
+        // Send the HTML content as a JSON string
+        res.status(200).json({ html: html });
       } catch (error) {
         console.error("Error fetching HTML:", error);
         res.status(500).json({ error: "Internal Server Error" });
