@@ -43,10 +43,17 @@ export default async function handler(req, res) {
         }
 
         const response = await fetch(encodeURI(url), { headers });
-        const html = await response.text();
-        res.status(200).json({ html });
+        const jsonResponse = await response.json();
+        
+        // Extract the "features" array and the "type" property from the JSON response
+        const { features, type } = jsonResponse.html;
+
+        // Construct a new JSON object with only the desired properties
+        const result = { features, type };
+
+        res.status(200).json(result);
       } catch (error) {
-        console.error("Error fetching HTML:", error);
+        console.error("Error fetching JSON:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
       }
       break;
