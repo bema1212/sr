@@ -1,3 +1,4 @@
+// api/handler.js
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
@@ -8,6 +9,9 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  // Set CSP headers
+  res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' https://your-vercel-deployment-url.vercel.app; script-src 'self'; style-src 'self';");
 
   // Handle OPTIONS preflight request
   if (method === "OPTIONS") {
