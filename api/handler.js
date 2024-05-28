@@ -14,22 +14,28 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Retrieve authorization header from the incoming request
-  const authorizationHeader = req.headers['authorization'];
+  // Validate the URL parameter
+  if (!url) {
+    return res.status(400).json({ error: "MissingParameterValue", message: "The 'url' query parameter is required." });
+  }
 
   console.log('Request method:', method);
   console.log('Request URL:', url);
-  console.log('Authorization header:', authorizationHeader);
+  console.log('Authorization header:', req.headers['authorization']);
+
+  // Ensure the URL includes the protocol
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    url = "https://" + url;
+  }
+
+  console.log('Fetching URL:', url);
+
+  // Retrieve authorization header from the incoming request
+  const authorizationHeader = req.headers['authorization'];
 
   switch (method) {
     case "GET":
       try {
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-          url = "https://" + url;
-        }
-
-        console.log('Fetching URL:', url);
-
         // Set up the headers for the fetch request
         const headers = {};
         if (authorizationHeader) {
