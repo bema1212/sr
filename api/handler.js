@@ -24,9 +24,11 @@ export default async function handler(req, res) {
   switch (method) {
     case "GET":
       try {
-        if (!url.includes("http://") && !url.includes("https://")) {
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
           url = "https://" + url;
         }
+
+        console.log('Fetching URL:', url);
 
         // Set up the headers for the fetch request
         const headers = {};
