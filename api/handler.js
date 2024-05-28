@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
   const { method } = req;
   let { url } = req.query;
@@ -42,9 +44,14 @@ export default async function handler(req, res) {
 
         const response = await fetch(encodeURI(url), { headers });
         const html = await response.text();
-        res.status(200).json({ html });
+        
+        // Parse the HTML string as JSON
+        const jsonResponse = JSON.parse(html);
+
+        // Respond with the JSON content
+        res.status(200).json(jsonResponse);
       } catch (error) {
-        console.error("Error fetching HTML:", error);
+        console.error("Error fetching JSON:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
       }
       break;
