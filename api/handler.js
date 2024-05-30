@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Timestamp");
 
   // Handle OPTIONS preflight request
   if (method === "OPTIONS") {
@@ -22,6 +22,7 @@ export default async function handler(req, res) {
   console.log('Request method:', method);
   console.log('Request URL:', url);
   console.log('Authorization header:', req.headers['authorization']);
+  console.log('Timestamp header:', req.headers['x-timestamp']);
 
   // Ensure the URL includes the protocol
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
@@ -30,8 +31,9 @@ export default async function handler(req, res) {
 
   console.log('Fetching URL:', url);
 
-  // Retrieve authorization header from the incoming request
+  // Retrieve authorization and timestamp headers from the incoming request
   const authorizationHeader = req.headers['authorization'];
+  const timestampHeader = req.headers['x-timestamp'];
 
   switch (method) {
     case "GET":
@@ -40,6 +42,9 @@ export default async function handler(req, res) {
         const headers = {};
         if (authorizationHeader) {
           headers['Authorization'] = authorizationHeader;
+        }
+        if (timestampHeader) {
+          headers['X-Timestamp'] = timestampHeader;
         }
 
         const response = await fetch(encodeURI(url), { headers });
