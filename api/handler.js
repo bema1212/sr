@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import moment from 'moment-timezone'; // Import moment-timezone library
 
 export default async function handler(req, res) {
   const { method } = req;
@@ -33,7 +34,13 @@ export default async function handler(req, res) {
 
   // Retrieve authorization and timestamp headers from the incoming request
   const authorizationHeader = req.headers['authorization'];
-  const timestampHeader = req.headers['x-timestamp'];
+  let timestampHeader = req.headers['x-timestamp']; // Modify this line
+
+  // Convert timestamp to Netherlands timezone
+  if (timestampHeader) {
+    timestampHeader = moment(timestampHeader).tz("Europe/Amsterdam").format(); // Modify "Europe/Amsterdam"
+    headers['X-Timestamp'] = timestampHeader;
+  }
 
   switch (method) {
     case "GET":
