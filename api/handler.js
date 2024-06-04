@@ -51,28 +51,38 @@ export default async function handler(req, res) {
         // Use fetch to request the URL
         const response = await fetch(encodeURI(url), {
           headers,
-          credentials: 'include' // Include credentials to handle cookies like JSESSIONID
+          credentials: 'include' // Include credentials to handle cookies like JSESSIONID and lbsticky
         });
 
-        // Retrieve the JSESSIONID from the response cookies
+        // Retrieve the JSESSIONID and lbsticky from the response cookies
         const setCookie = response.headers.raw()['set-cookie'];
         let jsessionid = null;
+        let lbsticky = null;
+
         if (setCookie) {
           const jsessionidCookie = setCookie.find(cookie => cookie.startsWith('JSESSIONID='));
+          const lbstickyCookie = setCookie.find(cookie => cookie.startsWith('lbsticky='));
+          
           if (jsessionidCookie) {
             jsessionid = jsessionidCookie.split(';')[0].split('=')[1];
           }
+          if (lbstickyCookie) {
+            lbsticky = lbstickyCookie.split(';')[0].split('=')[1];
+          }
         }
+
         console.log('JSESSIONID:', jsessionid);
+        console.log('LBSticky:', lbsticky);
 
         const html = await response.text();
         
         // Parse the HTML string as JSON
         const jsonResponse = JSON.parse(html);
 
-        // Respond with the JSON content and include the JSESSIONID if needed
+        // Respond with the JSON content and include the JSESSIONID and lbsticky if needed
         res.setHeader('X-Session-ID', jsessionid); // Set the session ID in the response headers
-        res.status(200).json({ jsessionid, ...jsonResponse });
+        res.setHeader('X-LBSticky', lbsticky); // Set the lbsticky in the response headers
+        res.status(200).json({ jsessionid, lbsticky, ...jsonResponse });
       } catch (error) {
         console.error("Error fetching JSON:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
