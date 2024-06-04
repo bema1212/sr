@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
   const { method } = req;
   let { url } = req.query;
@@ -5,7 +7,7 @@ export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Credentials","true"); 
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Timestamp");
 
   // Handle OPTIONS preflight request
@@ -47,13 +49,19 @@ export default async function handler(req, res) {
         }
 
         const response = await fetch(encodeURI(url), { headers });
+
+        // Retrieve the session ID from the response headers
+        const sessionId = response.headers.get('X-Session-ID');
+        console.log('Session ID:', sessionId);
+
         const html = await response.text();
         
         // Parse the HTML string as JSON
         const jsonResponse = JSON.parse(html);
 
-        // Respond with the JSON content
-        res.status(200).json(jsonResponse);
+        // Respond with the JSON content and include the session ID in the response
+        res.setHeader('X-Session-ID', sessionId); // Set the session ID in the response headers
+        res.status(200).json({ sessionId, ...jsonResponse });
       } catch (error) {
         console.error("Error fetching JSON:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
