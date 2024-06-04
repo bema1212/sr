@@ -48,20 +48,31 @@ export default async function handler(req, res) {
           headers['X-Timestamp'] = timestampHeader;
         }
 
-        const response = await fetch(encodeURI(url), { headers });
+        // Use fetch to request the URL
+        const response = await fetch(encodeURI(url), {
+          headers,
+          credentials: 'include' // Include credentials to handle cookies like JSESSIONID
+        });
 
-        // Retrieve the session ID from the response headers
-        const sessionId = response.headers.get('X-Session-ID');
-        console.log('Session ID:', sessionId);
+        // Retrieve the JSESSIONID from the response cookies
+        const setCookie = response.headers.raw()['set-cookie'];
+        let jsessionid = null;
+        if (setCookie) {
+          const jsessionidCookie = setCookie.find(cookie => cookie.startsWith('JSESSIONID='));
+          if (jsessionidCookie) {
+            jsessionid = jsessionidCookie.split(';')[0].split('=')[1];
+          }
+        }
+        console.log('JSESSIONID:', jsessionid);
 
         const html = await response.text();
         
         // Parse the HTML string as JSON
         const jsonResponse = JSON.parse(html);
 
-        // Respond with the JSON content and include the session ID in the response
-        res.setHeader('X-Session-ID', sessionId); // Set the session ID in the response headers
-        res.status(200).json({ sessionId, ...jsonResponse });
+        // Respond with the JSON content and include the JSESSIONID if needed
+        res.setHeader('X-Session-ID', jsessionid); // Set the session ID in the response headers
+        res.status(200).json({ jsessionid, ...jsonResponse });
       } catch (error) {
         console.error("Error fetching JSON:", error);
         res.status(500).json({ error: "Internal Server Error", details: error.message });
