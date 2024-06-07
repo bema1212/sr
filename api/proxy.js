@@ -3,11 +3,16 @@ const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
   try {
-    // Retrieve the external URL from the query parameters sent by the client
-    const externalUrl = req.query.url;
+    // Retrieve the external URL and cookies from the query parameters sent by the client
+    const { url, cookies } = req.query;
 
     // Make a request to the external URL
-    const response = await fetch(externalUrl);
+    const response = await fetch(url, {
+      headers: {
+        // Include cookies in the request headers
+        Cookie: cookies || ''
+      }
+    });
 
     // Check if the request was successful
     if (!response.ok) {
