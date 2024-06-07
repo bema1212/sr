@@ -3,19 +3,21 @@ const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
   try {
-    // Get the URL query parameter
-    const { url } = req.query;
+    // Define the external URL
+    const externalUrl = 'https://external-url.com'; // Replace with the actual external URL
 
     // Make a request to the external URL
-    const response = await fetch(url);
+    const response = await fetch(externalUrl);
 
     // Check if the request was successful
     if (!response.ok) {
       throw new Error('Failed to fetch data from external URL');
     }
 
-    // Parse the JSON response and send it back
+    // Parse the JSON response
     const data = await response.json();
+
+    // Send the JSON data back to the client
     res.status(200).json(data);
   } catch (error) {
     console.error(error);
