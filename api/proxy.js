@@ -3,8 +3,11 @@ const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
   try {
+    // Get the URL query parameter
+    const { url } = req.query;
+
     // Make a request to the external URL
-    const response = await fetch('https://external-url.com');
+    const response = await fetch(url);
 
     // Check if the request was successful
     if (!response.ok) {
